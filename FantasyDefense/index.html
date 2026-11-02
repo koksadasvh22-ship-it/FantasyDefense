@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>FantasyDefense</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+</head>
+<body>
+
+<!-- =====================================================================
+     HTML STRUCTURE
+     ===================================================================== -->
+
+<!-- Main Menu Screen (Custom background support with multi-screen navigation) -->
+<div id="main-menu">
+  
+  <!-- Top bar on main menu: audio toggle and profile quick badge -->
+  <div id="menu-topbar">
+    <div id="menu-profile-pill" title="Click to edit profile">
+      <span class="profile-avatar">🛡️</span>
+      <div class="profile-info">
+        <span class="profile-label">COMMANDER</span>
+        <span id="menu-profile-name" class="profile-name">Commander Adam</span>
+      </div>
+      <button id="btn-edit-profile" class="profile-edit-btn" title="Edit Profile">✏️</button>
+    </div>
+    <button id="btn-menu-audio" class="menu-icon-btn" title="Toggle Audio">🔊</button>
+  </div>
+
+  <!-- Center Card: Main Menu Navigation -->
+  <div id="menu-card">
+    <div class="menu-header">
+      <h1 id="menu-title">FantasyDefense</h1>
+      <div id="menu-subtitle">Kingdom Bastion</div>
+    </div>
+    
+    <div class="menu-divider"></div>
+    
+    <div id="menu-nav-buttons">
+      <button id="btn-menu-play" class="menu-btn primary-btn">
+        <span class="btn-icon">⚔️</span>
+        <span class="btn-text">Play / Select Wave</span>
+      </button>
+      <button id="btn-menu-settings" class="menu-btn">
+        <span class="btn-icon">⚙️</span>
+        <span class="btn-text">Settings</span>
+      </button>
+      <button id="btn-menu-credits" class="menu-btn">
+        <span class="btn-icon">📜</span>
+        <span class="btn-text">Credits</span>
+      </button>
+      <button id="btn-menu-exit" class="menu-btn quit-btn">
+        <span class="btn-icon">🚪</span>
+        <span class="btn-text">Exit Game</span>
+      </button>
+    </div>
+
+    <div class="menu-footer-stats">
+      <span>🌊 Max Wave: <b id="menu-stat-wave">1</b>/10</span>
+      <span>🏆 High Score: <b id="menu-stat-score">0</b></span>
+      <span>💀 Total Defeated: <b id="menu-stat-kills">0</b></span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Top-Level Modals (accessible from Menu and Pause Overlay) -->
+  <!-- Sub-screen: Wave Select Modal -->
+  <div id="modal-wave-select" class="menu-submodal hidden">
+    <div class="modal-card">
+      <h2 class="modal-title">⚔️ Select Starting Wave</h2>
+      <p class="modal-desc">Choose which wave to deploy into or launch directly:</p>
+      <div id="wave-select-grid">
+        <!-- Generated dynamically via JS -->
+      </div>
+      <div class="modal-actions">
+        <button id="btn-deploy-wave" class="menu-btn primary-btn">▶ Deploy to Battle</button>
+        <button id="btn-close-waves" class="menu-btn sub-back-btn">⬅ Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-screen: Settings Modal -->
+  <div id="modal-settings" class="menu-submodal hidden">
+    <div class="modal-card">
+      <h2 class="modal-title">⚙️ Game Settings</h2>
+      
+      <div class="settings-group">
+        <label>🎵 Music Volume</label>
+        <div class="settings-row">
+          <input type="range" id="setting-music-volume" min="0" max="100" value="50" />
+          <span id="setting-music-volume-label">50%</span>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label>🔊 Sound Effects (SFX) Volume</label>
+        <div class="settings-row">
+          <input type="range" id="setting-sfx-volume" min="0" max="100" value="70" />
+          <span id="setting-sfx-volume-label">70%</span>
+        </div>
+      </div>
+
+      <!-- Backward compatibility hidden fields -->
+      <input type="range" id="setting-volume" min="0" max="100" value="50" style="display:none;" />
+      <span id="setting-volume-label" style="display:none;">50%</span>
+
+      <div class="settings-group">
+        <label>⚡ Game Speed</label>
+        <div class="speed-toggle-group">
+          <button class="speed-btn active" data-speed="1.0">1.0x Normal</button>
+          <button class="speed-btn" data-speed="1.5">1.5x Fast</button>
+          <button class="speed-btn" data-speed="2.0">2.0x Turbo</button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label>✨ Graphics / Particles</label>
+        <div class="speed-toggle-group">
+          <button class="fx-btn active" data-fx="high">High (Full FX)</button>
+          <button class="fx-btn" data-fx="low">Low (Battery)</button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-close-settings" class="menu-btn primary-btn">⬅ Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-screen: Credits Modal -->
+  <div id="modal-credits" class="menu-submodal hidden">
+    <div class="modal-card credits-card">
+      <h2 class="modal-title">📜 Game Credits</h2>
+      <div class="credits-body">
+        <div class="credit-item">
+          <div class="credit-role">Lead Technical Architect & Developer</div>
+          <div class="credit-name">Adam</div>
+        </div>
+        <div class="credit-item">
+          <div class="credit-role">Game Engine & Rendering</div>
+          <div class="credit-name">Pure Vanilla ES6+ & HTML5 Canvas 2D</div>
+        </div>
+        <div class="credit-item">
+          <div class="credit-role">Soundtrack & Audio Engine</div>
+          <div class="credit-name">HTML5 Audio (`soundtrack.mp3`) + Web Audio Synthesizer</div>
+        </div>
+        <div class="credit-item">
+          <div class="credit-role">Visual Design & Menu Art</div>
+          <div class="credit-name">Vector Canvas Primitives & Custom Background (`menu_bg.png`)</div>
+        </div>
+        <div class="credit-item">
+          <div class="credit-role">Design Inspiration</div>
+          <div class="credit-name">Kingdom Rush & Classic Tower Defense</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-close-credits" class="menu-btn primary-btn">⬅ Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-screen: Profile Edit Modal -->
+  <div id="modal-profile" class="menu-submodal hidden">
+    <div class="modal-card">
+      <h2 class="modal-title">🛡️ Commander Profile</h2>
+      <p class="modal-desc">Enter your commander name to personalize your defense campaign:</p>
+      <input type="text" id="input-profile-name" maxlength="20" placeholder="Commander Adam" class="profile-input" />
+      <div class="modal-actions">
+        <button id="btn-save-profile" class="menu-btn primary-btn">💾 Save Profile</button>
+        <button id="btn-close-profile" class="menu-btn sub-back-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-screen: Exit Modal -->
+  <div id="modal-exit" class="menu-submodal hidden">
+    <div class="modal-card">
+      <h2 class="modal-title">🚪 Exit FantasyDefense</h2>
+      <p class="modal-desc">Thank you for defending the realm, Commander! You may safely close this browser window or return to the bastion.</p>
+      <div class="modal-actions">
+        <button id="btn-cancel-exit" class="menu-btn primary-btn">⚔️ Continue Playing</button>
+        <button id="btn-reset-data" class="menu-btn quit-btn">🗑️ Reset Progress Data</button>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- Background Soundtrack Audio (Looping HTML5 Audio with graceful error fallback) -->
+<audio id="bg-audio" src="soundtrack.mp3" loop preload="auto"></audio>
+
+<div id="game-wrapper">
+
+  <!-- Top HUD -->
+  <div id="hud">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="hud-item" title="Player Gold"><img src="coin.png" class="coin-icon" alt="Gold"> <span id="hud-gold">150</span></div>
+      <div class="hud-item" title="Kingdom Health">❤️ <span id="hud-lives">20</span></div>
+      <div class="hud-item" title="Current Wave">🌊 <span id="hud-wave">0/10</span></div>
+      <div class="hud-item" id="hud-wave-info" title="Wave Threat & Progress" style="font-size: clamp(9px, 1.25vw, 11px); color: #ffe082; background: rgba(0,0,0,0.55); padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(255,213,79,0.3); display: flex; align-items: center; gap: 4px;">
+        <span style="font-size:9.5px; color:#ffb74d;">NEXT:</span> <b id="hud-next-text" style="color:#fff; font-size:clamp(9px, 1.3vw, 11.5px);">W1 · Scout Incursion</b>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div class="hud-item" title="Enemies Slain">💀 <span id="hud-kills">0</span></div>
+      <div class="hud-item" title="Current Score and High Score">🏆 <span id="hud-score">0</span> <span style="font-size:11px; opacity:0.85; font-weight:normal; margin-left:3px;">(HI: <b id="hud-high-score">0</b>)</span></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div id="hero-hud" title="Click to select/move Hero">
+        <span class="hero-hud-icon">⚔️</span>
+        <div class="hero-hud-info">
+          <span class="hero-hud-name">HERO</span>
+          <div class="hero-hud-hpbar-bg"><div class="hero-hud-hpbar-fill" id="hero-hp-bar" style="width:100%"></div></div>
+          <span id="hero-respawn-text">Respawning…</span>
+        </div>
+      </div>
+      <button id="btn-audio" title="Toggle Music">🔊</button>
+      <button id="btn-pause">⏸ Pause</button>
+    </div>
+  </div>
+
+  <!-- Game Canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- Bottom Panel: Tower buttons + Start Wave -->
+  
+  <!-- Floating Bottom Selection & Info Box -->
+  <div id="unit-info-box" class="hidden">
+    <div id="unit-info-icon" class="unit-info-avatar">🛡️</div>
+    <div class="unit-info-content">
+      <div class="unit-info-header">
+        <span id="unit-info-name" class="unit-info-title">Commander Hero</span>
+        <span id="unit-info-type" class="unit-info-badge">HERO</span>
+      </div>
+      <div class="unit-info-hp-container">
+        <div class="unit-info-hp-track">
+          <div id="unit-info-hp-bar" class="unit-info-hp-fill"></div>
+        </div>
+        <span id="unit-info-hp-text" class="unit-info-hp-val">250/250</span>
+      </div>
+      <div id="unit-info-stats" class="unit-info-subtext">⚔️ DMG: 25 | 🏃 SPD: 95</div>
+    </div>
+    <button id="unit-info-close" class="unit-info-close-btn" title="Close Selection">✕</button>
+  </div>
+
+  <div id="bottom-panel">
+    <div id="tower-buttons">
+      <!-- These buttons are now info-only; clicking canvas build nodes opens popup -->
+      <button class="tower-btn" data-type="archer" id="btn-archer">
+        <canvas width="38" height="38" id="icon-archer"></canvas>
+        <div class="tb-name">Archer</div>
+        <div class="tb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 50</div>
+        <div class="tb-desc">Fast · Single</div>
+      </button>
+      <button class="tower-btn" data-type="mage" id="btn-mage">
+        <canvas width="38" height="38" id="icon-mage"></canvas>
+        <div class="tb-name">Mage</div>
+        <div class="tb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 80</div>
+        <div class="tb-desc">Slow · AoE</div>
+      </button>
+      <button class="tower-btn" data-type="cannon" id="btn-cannon">
+        <canvas width="38" height="38" id="icon-cannon"></canvas>
+        <div class="tb-name">Cannon</div>
+        <div class="tb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 120</div>
+        <div class="tb-desc">Heavy · AoE</div>
+      </button>
+      <button class="tower-btn" data-type="barracks" id="btn-barracks">
+        <canvas width="38" height="38" id="icon-barracks"></canvas>
+        <div class="tb-name">Barracks</div>
+        <div class="tb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 70</div>
+        <div class="tb-desc">Soldiers</div>
+      </button>
+    </div>
+    <button id="btn-wave">⚔️ Start Wave 1</button>
+  </div>
+
+  <!-- Hero Status Panel (in HUD - added via JS) -->
+
+  <!-- Spell Dock: WHIRL, METEOR, REINFORCE -->
+  <div id="spell-dock">
+    <!-- Hero Whirlwind Spell Button (Hotkey: 2) -->
+    <button id="spell-hero-btn" title="Hero Whirlwind (15s CD, Hotkey: 2)">
+      <div class="spell-icon-wrap">
+        <span class="spell-emoji" style="font-size:18px;">🌀</span>
+        <span class="spell-name" style="font-size:7.5px;">WHIRL</span>
+      </div>
+      <div class="hero-spell-cd-overlay" id="hero-spell-cd-overlay">
+        <span id="hero-spell-cd-text">15s</span>
+      </div>
+    </button>
+
+    <!-- Meteor Strike Spell Button (Hotkey: 1 or M) -->
+    <button id="spell-meteor-btn" title="Cast Meteor Strike (30s CD, Hotkey: M or 1)">
+      <div class="spell-icon-wrap">
+        <span class="spell-emoji">☄️</span>
+        <span class="spell-name">METEOR</span>
+      </div>
+      <div class="spell-cd-overlay" id="spell-cd-overlay">
+        <span id="spell-cd-text">30s</span>
+      </div>
+    </button>
+
+    <!-- Call Reinforcements Spell Button (Hotkey: 3 or R) -->
+    <button id="spell-reinforce-btn" title="Call Reinforcements (20s CD, Hotkey: 3 or R)">
+      <div class="spell-icon-wrap">
+        <span class="spell-emoji">👥</span>
+        <span class="spell-name">REINFORCE</span>
+      </div>
+      <div class="spell-cd-overlay" id="reinforce-spell-cd-overlay">
+        <span id="reinforce-spell-cd-text">20s</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Build Popup (tower selection for a chosen build node) -->
+  <div id="build-popup" class="hidden">
+    <div id="popup-title">🏗 Build Tower</div>
+    <div id="popup-options">
+      <button class="popup-tower-btn" data-type="archer">
+        <canvas width="44" height="44" id="popup-icon-archer"></canvas>
+        <div class="ptb-name">Archer</div>
+        <div class="ptb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 50</div>
+        <div class="ptb-desc">Fast single-target</div>
+      </button>
+      <button class="popup-tower-btn" data-type="mage">
+        <canvas width="44" height="44" id="popup-icon-mage"></canvas>
+        <div class="ptb-name">Mage</div>
+        <div class="ptb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 80</div>
+        <div class="ptb-desc">AoE splash orb</div>
+      </button>
+      <button class="popup-tower-btn" data-type="cannon">
+        <canvas width="44" height="44" id="popup-icon-cannon"></canvas>
+        <div class="ptb-name">Cannon</div>
+        <div class="ptb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 120</div>
+        <div class="ptb-desc">Heavy boom AoE</div>
+      </button>
+      <button class="popup-tower-btn" data-type="barracks">
+        <canvas width="44" height="44" id="popup-icon-barracks"></canvas>
+        <div class="ptb-name">Barracks</div>
+        <div class="ptb-cost"><img src="coin.png" class="coin-icon-sm" alt=""> 70</div>
+        <div class="ptb-desc">Spawns soldiers</div>
+      </button>
+    </div>
+    <button id="popup-cancel">✕ Cancel</button>
+  </div>
+
+  <!-- Tower Action Popup (Upgrade / Sell for an existing tower) -->
+  <div id="tower-action-popup" class="hidden">
+    <div id="tap-header">
+      <div id="tap-title">🏹 Archer Tower (Lv 1)</div>
+      <button id="tap-close" title="Close">✕</button>
+    </div>
+    <div id="tap-stats">
+      <span class="tap-stat-item">💥 Dmg: <b id="tap-dmg">20</b></span>
+      <span class="tap-stat-item">🎯 Rng: <b id="tap-rng">130</b></span>
+      <span class="tap-stat-item">⚡ Spd: <b id="tap-spd">1.5</b>/s</span>
+    </div>
+    <div id="tap-actions">
+      <button id="btn-tower-upgrade" class="tap-btn upgrade">
+        <div class="tap-btn-main">🔼 Upgrade Lv <span id="tap-next-lvl">2</span></div>
+        <div class="tap-btn-sub" id="tap-upgrade-info"><img src="coin.png" class="coin-icon-sm" alt=""> 45 (+15 Dmg, +25 Rng)</div>
+      </button>
+      <button id="btn-tower-rally" class="tap-btn rally hidden">
+        <div class="tap-btn-main">🚩 Rally Point</div>
+        <div class="tap-btn-sub">Move soldiers on path</div>
+      </button>
+      <button id="btn-tower-sell" class="tap-btn sell">
+        <div class="tap-btn-main">💰 Sell Tower</div>
+        <div class="tap-btn-sub" id="tap-sell-info"><img src="coin.png" class="coin-icon-sm" alt=""> +35 (70% refund)</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Wave announcement banner -->
+  <div id="wave-banner"></div>
+
+  <!-- Overlay screen (Game Over / Victory) -->
+  <div id="overlay" class="hidden">
+    <div id="overlay-card" class="defeat-mode">
+      <div id="overlay-badge">🏆</div>
+      <h1 id="overlay-title">Victory, Commander!</h1>
+      <p id="overlay-msg">The realm is victorious! All enemy waves were vanquished.</p>
+
+      <div class="overlay-stats-grid">
+        <div class="overlay-stat-box">
+          <div class="osb-label">🌊 Waves Survived</div>
+          <div class="osb-value" id="os-waves">5 / 5</div>
+        </div>
+        <div class="overlay-stat-box">
+          <div class="osb-label">💀 Enemies Slain</div>
+          <div class="osb-value" id="os-kills">0</div>
+        </div>
+        <div class="overlay-stat-box">
+          <div class="osb-label"><img src="coin.png" class="coin-icon-sm" alt=""> Run Score</div>
+          <div class="osb-value" id="os-score">0</div>
+        </div>
+        <div class="overlay-stat-box highlight">
+          <div class="osb-label">🏆 Best High Score</div>
+          <div class="osb-value" id="os-highscore">0</div>
+          <span id="os-new-high" class="new-high-badge hidden">NEW RECORD! ⭐</span>
+        </div>
+      </div>
+
+      <div class="overlay-lifetime-row">
+        <span>🎖️ Total Lifetime Enemies Defeated: <b id="os-lifetime-kills">0</b></span>
+      </div>
+
+      <div class="overlay-btn-row">
+        <button id="overlay-btn">🔄 Try Again</button>
+        <button id="overlay-endless-btn" class="hidden">⚔️ Endless Mode</button>
+        <button id="overlay-menu-btn">🏠 Return to Menu</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#game-wrapper -->
+
+  <!-- Pause Menu Overlay Modal -->
+  <div id="modal-pause" class="menu-submodal hidden">
+    <div class="modal-card pause-card">
+      <h2 class="modal-title">⏸ Game Paused</h2>
+      <p class="modal-desc">Defenders are standing by. What are your orders, Commander?</p>
+      <div class="modal-actions modal-pause-actions">
+        <button id="btn-pause-resume" class="menu-btn primary-btn">▶ Resume Game</button>
+        <button id="btn-pause-restart" class="menu-btn warning-btn">🔄 Restart Level</button>
+        <button id="btn-pause-settings" class="menu-btn">⚙️ Audio & Settings</button>
+        <button id="btn-pause-menu" class="menu-btn quit-btn">🏠 Return to Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+
+<!-- =====================================================================
+     GAME SCRIPT
+     ===================================================================== -->
+<script src="game.js"></script>
+</body>
+</html>
